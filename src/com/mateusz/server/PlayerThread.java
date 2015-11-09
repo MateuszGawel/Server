@@ -44,7 +44,7 @@ public class PlayerThread extends Thread {
 					if (!players.contains(this)) {
 						playerName = name;
 						players.add(this);
-						System.out.println("DODALEM I MAM PLAYERÓW:");
+						System.out.println("DODALEM I MAM PLAYEROW:");
 						players.forEach((p) -> System.out.println(p));
 					}
 				} else {
@@ -55,6 +55,7 @@ public class PlayerThread extends Thread {
 				}
 			} catch (IOException e) {
 				LOGGER.log(Level.INFO, "Player disconnected: " + playerName);
+				players.remove(this);
 				break;
 			}
 		}
