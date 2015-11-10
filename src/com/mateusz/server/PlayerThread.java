@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class PlayerThread extends Thread {
 	private static final Logger LOGGER = Logger.getLogger(PlayerThread.class.getName());
 
@@ -19,6 +22,7 @@ public class PlayerThread extends Thread {
 	private DataOutputStream out;
 
 	private String playerName;
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public PlayerThread(Socket socket) throws IOException {
 		try {
@@ -36,30 +40,27 @@ public class PlayerThread extends Thread {
 			try {
 				String inputMessage = in.readUTF();
 				System.out.println("GOT: " + inputMessage);
-
-				String name = inputMessage.split(":")[1];
-				String msg = inputMessage.split(":")[3];
-
-				if (msg.equalsIgnoreCase("SUBSCRIBE")) {
-					if (!players.contains(this)) {
-						playerName = name;
-						players.add(this);
-						System.out.println("DODALEM I MAM PLAYEROW:");
-						players.forEach((p) -> System.out.println(p));
-					}
-				} else {
-					for (PlayerThread p : players) {
-						if (!p.equals(this))
-							p.getOut().writeUTF("SENDER:" + playerName + ":MSG:" + msg);
-					}
+				JsonNode jsonNode = objectMapper.readTree(inputMessage);
+				String senderName = jsonNode.get("senderName").asText();
+				
+				if (!players.contains(this)) {
+					playerName = senderName;
+					players.add(this);
+					System.out.println("DODALEM I MAM PLAYEROW:");
+					players.forEach((p) -> System.out.println(p));
 				}
+
+				for (PlayerThread p : players) {
+					p.getOut().writeUTF(inputMessage);
+				}
+
 			} catch (IOException e) {
 				LOGGER.log(Level.INFO, "Player disconnected: " + playerName);
 				players.remove(this);
 				break;
 			}
 		}
-		
+
 		try {
 			socket.close();
 		} catch (IOException e) {
