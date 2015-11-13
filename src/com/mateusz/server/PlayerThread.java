@@ -42,7 +42,7 @@ public class PlayerThread extends Thread {
 				System.out.println("GOT: " + inputMessage);
 				JsonNode jsonNode = objectMapper.readTree(inputMessage);
 				String senderName = jsonNode.get("senderName").asText();
-				
+
 				if (!players.contains(this)) {
 					playerName = senderName;
 					players.add(this);
@@ -69,6 +69,19 @@ public class PlayerThread extends Thread {
 	}
 
 	@Override
+	public String toString() {
+		return "Player [name=" + playerName + "]";
+	}
+
+	public DataInputStream getIn() {
+		return in;
+	}
+
+	public DataOutputStream getOut() {
+		return out;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -91,18 +104,5 @@ public class PlayerThread extends Thread {
 		} else if (!playerName.equals(other.playerName))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Player [name=" + playerName + "]";
-	}
-
-	public DataInputStream getIn() {
-		return in;
-	}
-
-	public DataOutputStream getOut() {
-		return out;
 	}
 }

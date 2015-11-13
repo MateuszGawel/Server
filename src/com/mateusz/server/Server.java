@@ -26,7 +26,7 @@ public class Server extends Thread {
 				System.out.println("LISTENING...");
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("GOT CONNECTION");
-
+				
 				PlayerThread playerThread = new PlayerThread(clientSocket);
 				playerThread.start();
 			} catch (IOException e) {
